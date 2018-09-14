@@ -1,0 +1,128 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+android {
+	compileSdkVersion 27
+
+	defaultConfig {
+		minSdkVersion 16
+		targetSdkVersion 27
+		versionCode 1
+		versionName "1.0.0"
+
+		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+
+	compileOptions {
+		targetCompatibility 1.8
+		sourceCompatibility 1.8
+	}
+}
+
+ext.artifact = [
+		'groupId': 'ru.superjob',
+		'id'     : 'kotlin-permissions',
+		'version': '1.0.0',
+		'siteUrl': 'https://github.com',
+		'gitUrl' : 'https://github.com',
+		'userOrg': 'superjob',
+		'repo'   : 'android'
+]
+
+version = artifact.version
+group = artifact.groupId
+
+install {
+	repositories.mavenInstaller {
+		pom.project {
+			packaging 'jar'
+			groupId artifact.groupId
+			artifactId artifact.id
+			version artifact.version
+			name artifact.id // pom.project.name must be same as bintray.pkg.name
+			url artifact.siteUrl
+			inceptionYear '2018' // HARDCODED
+			licenses {
+				license { // HARDCODED
+					name 'GPL-3.0'
+					url 'https://www.gnu.org/licenses/gpl.txt'
+					distribution 'repo'
+				}
+			}
+			scm {
+				connection artifact.gitUrl
+				developerConnection artifact.gitUrl
+				url artifact.siteUrl
+			}
+		}
+	}
+}
+
+task sourcesJar(type: Jar) {
+	from android.sourceSets.main.java.srcDirs
+	classifier = "sources"
+}
+
+task javadoc(type: Javadoc) {
+	source = android.sourceSets.main.java.srcDirs
+	classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = "javadoc"
+	from javadoc.destinationDir
+	// options.encoding = ‘UTF-8’
+}
+
+artifacts {
+	archives sourcesJar
+//	archives javadocJar
+}
+
+Properties properties = new Properties()
+File propFile = "${System.properties['user.home']}/.gradle/bintray.properties" as File
+properties.load(propFile.newDataInputStream())
+
+bintray {
+	user = properties.getProperty("bintray.user")
+	key = properties.getProperty("bintray.apikey")
+
+	configurations = ['archives']
+	pkg {
+		repo = artifact.repo
+		name = artifact.id
+		websiteUrl = artifact.siteUrl
+		vcsUrl = artifact.gitUrl
+		userOrg = artifact.userOrg
+		licenses = ['Apache-2.0']
+		publish = true
+		version {
+			name = artifact.version
+		}
+	}
+}
+
+dependencies {
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+	implementation 'com.android.support:appcompat-v7:27.1.1'
+	testImplementation 'junit:junit:4.12'
+	androidTestImplementation 'com.android.support.test:runner:1.0.2'
+	androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+	testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+	testImplementation 'org.testng:testng:6.9.6'
+}
+repositories {
+	mavenCentral()
+}

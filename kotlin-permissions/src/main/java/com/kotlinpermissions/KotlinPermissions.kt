@@ -21,9 +21,9 @@ object KotlinPermissions {
     class PermissionCore(activity: FragmentActivity) {
         private val activityReference: WeakReference<FragmentActivity> = WeakReference(activity)
         private var permissions: List<String> = ArrayList()
-        private var acceptedCallback: ResponsePermissionCallback? = null
-        private var deniedCallback: ResponsePermissionCallback? = null
-        private var foreverDeniedCallback: ResponsePermissionCallback? = null
+        private var acceptedCallback: WeakReference<ResponsePermissionCallback>? = null
+        private var deniedCallback: WeakReference<ResponsePermissionCallback>? = null
+        private var foreverDeniedCallback: WeakReference<ResponsePermissionCallback>? = null
         private val listener = object : PermissionFragment.PermissionListener {
             override fun onRequestPermissionsResult(acceptedPermissions: List<String>, refusedPermissions: List<String>, askAgainPermissions: List<String>) {
                 onReceivedPermissionResult(acceptedPermissions, refusedPermissions, askAgainPermissions)
@@ -33,15 +33,15 @@ object KotlinPermissions {
         internal fun onReceivedPermissionResult(acceptedPermissions: List<String>?, foreverDenied: List<String>?, denied: List<String>?) {
 
             acceptedPermissions.whenNotNullNorEmpty {
-                acceptedCallback?.onResult(it)
+                acceptedCallback?.get()?.onResult(it)
             }
 
             foreverDenied.whenNotNullNorEmpty {
-                foreverDeniedCallback?.onResult(it)
+                foreverDeniedCallback?.get()?.onResult(it)
             }
 
             denied.whenNotNullNorEmpty {
-                deniedCallback?.onResult(it)
+                deniedCallback?.get()?.onResult(it)
             }
         }
 
@@ -51,44 +51,44 @@ object KotlinPermissions {
         }
 
         fun onAccepted(callback: (List<String>) -> Unit): PermissionCore {
-            this.acceptedCallback = object : ResponsePermissionCallback {
+            this.acceptedCallback = WeakReference(object : ResponsePermissionCallback {
                 override fun onResult(permissionResult: List<String>) {
                     callback(permissionResult)
                 }
-            }
+            })
             return this@PermissionCore
         }
 
         fun onAccepted(callback: ResponsePermissionCallback): PermissionCore {
-            this.acceptedCallback = callback
+            this.acceptedCallback = WeakReference(callback)
             return this@PermissionCore
         }
 
         fun onDenied(callback: (List<String>) -> Unit): PermissionCore {
-            this.deniedCallback = object : ResponsePermissionCallback {
+            this.deniedCallback = WeakReference(object : ResponsePermissionCallback {
                 override fun onResult(permissionResult: List<String>) {
                     callback(permissionResult)
                 }
-            }
+            })
             return this@PermissionCore
         }
 
         fun onDenied(callback: ResponsePermissionCallback): PermissionCore {
-            this.deniedCallback = callback
+            this.deniedCallback = WeakReference(callback)
             return this@PermissionCore
         }
 
         fun onForeverDenied(callback: (List<String>) -> Unit): PermissionCore {
-            this.foreverDeniedCallback = object : ResponsePermissionCallback {
+            this.foreverDeniedCallback = WeakReference(object : ResponsePermissionCallback {
                 override fun onResult(permissionResult: List<String>) {
                     callback(permissionResult)
                 }
-            }
+            })
             return this@PermissionCore
         }
 
         fun onForeverDenied(callback: ResponsePermissionCallback): PermissionCore {
-            this.foreverDeniedCallback = callback
+            this.foreverDeniedCallback = WeakReference(callback)
             return this@PermissionCore
         }
 

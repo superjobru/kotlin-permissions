@@ -89,13 +89,9 @@ artifacts {
 //	archives javadocJar
 }
 
-Properties properties = new Properties()
-File propFile = "${System.properties['user.home']}/.gradle/bintray.properties" as File
-properties.load(propFile.newDataInputStream())
-
 bintray {
-	user = properties.getProperty("bintray.user")
-	key = properties.getProperty("bintray.apikey")
+	user = System.getenv('user')
+	key = System.getenv('key')
 
 	configurations = ['archives']
 	pkg {

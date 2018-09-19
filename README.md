@@ -5,6 +5,7 @@
 An Android library, written in Kotlin, which helps avoid boilerplate code when your request runtime permissions. You don't need to override onPermissionResult, all results will be in one place.
 
 ## Gradle
+[ ![Download](https://api.bintray.com/packages/superjob/android/kotlin-permissions/images/download.svg) ](https://bintray.com/superjob/android/kotlin-permissions/_latestVersion)
 ```gradle
 dependencies {
     implementation 'ru.superjob:kotlin-permissions:1.0.0'

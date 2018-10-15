@@ -7,10 +7,10 @@ android {
 	compileSdkVersion 27
 
 	defaultConfig {
-		minSdkVersion 14
+		minSdkVersion 16
 		targetSdkVersion 27
 		versionCode 1
-		versionName "1.0.0"
+		versionName "1.0.1"
 
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -32,7 +32,7 @@ android {
 ext.artifact = [
 		'groupId': 'ru.superjob',
 		'id'     : 'kotlin-permissions',
-		'version': '1.0.0',
+		'version': '1.0.1',
 		'siteUrl': 'https://github.com',
 		'gitUrl' : 'https://github.com',
 		'userOrg': 'superjob',
@@ -89,9 +89,13 @@ artifacts {
 //	archives javadocJar
 }
 
+Properties properties = new Properties()
+File propFile = "${System.properties['user.home']}/.gradle/bintray.properties" as File
+properties.load(propFile.newDataInputStream())
+
 bintray {
-	user = System.getenv('user')
-	key = System.getenv('key')
+	user = properties.getProperty("bintray.user")
+	key = properties.getProperty("bintray.apikey")
 
 	configurations = ['archives']
 	pkg {

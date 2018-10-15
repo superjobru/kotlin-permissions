@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class PermissionFragment : Fragment() {
     private val permissionQueue = ConcurrentLinkedQueue<PermissionHolder>()
     private var permissionsList: List<String> = ArrayList()
-    private lateinit var listener: PermissionListener
+    private var listener: PermissionListener? = null
     private var waitingForReceive = false
 
 
@@ -44,7 +44,7 @@ class PermissionFragment : Fragment() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == REQUEST_CODE && permissions.isNotEmpty()) {
+        if (requestCode == REQUEST_CODE && permissions.isNotEmpty() && grantResults.isNotEmpty()) {
 
             val acceptedPermissions = ArrayList<String>()
             val askAgainPermissions = ArrayList<String>()
@@ -63,7 +63,7 @@ class PermissionFragment : Fragment() {
                 }
             }
 
-            listener.onRequestPermissionsResult(acceptedPermissions, refusedPermissions, askAgainPermissions)
+            listener?.onRequestPermissionsResult(acceptedPermissions, refusedPermissions, askAgainPermissions)
         }
         waitingForReceive = false
     }
